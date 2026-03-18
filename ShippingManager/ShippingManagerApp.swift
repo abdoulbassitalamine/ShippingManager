@@ -1,17 +1,36 @@
-//
-//  ShippingManagerApp.swift
-//  ShippingManager
-//
-//  Created by Laminou Amadou Abdoul Bassit on 18/3/2026.
-//
-
 import SwiftUI
 
 @main
 struct ShippingManagerApp: App {
+
+    @State private var orderListViewModel    = OrderListViewModel()
+    @State private var containerConfigViewModel = ContainerConfigViewModel()
+    @State private var shippingPlanViewModel = ShippingPlanViewModel()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TabView {
+                Tab("Commandes", systemImage: "shippingbox") {
+                    OrderListView(
+                        viewModel: orderListViewModel,
+                        containerConfig: containerConfigViewModel.config
+                    )
+                }
+
+                Tab("Conteneurs", systemImage: "slider.horizontal.3") {
+                    ContainerConfigView(viewModel: containerConfigViewModel)
+                }
+
+                Tab("Expédition", systemImage: "ferry") {
+                    ShippingPlanView(
+                        viewModel: shippingPlanViewModel,
+                        orders: orderListViewModel.orders,
+                        configViewModel: containerConfigViewModel
+                    )
+                }
+            }
+            .tint(Color.accentBlue)
+            .preferredColorScheme(.dark)
         }
     }
 }
