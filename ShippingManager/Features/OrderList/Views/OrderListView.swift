@@ -9,32 +9,31 @@ struct OrderListView: View {
     @State private var animationTrigger = false
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.appBackground.ignoresSafeArea()
+        ZStack {
+            Color.appBackground.ignoresSafeArea()
 
-                VStack(spacing: 0) {
-                    priorityFilterBar
+            VStack(spacing: 0) {
+                priorityFilterBar
 
-                    if viewModel.filteredOrders.isEmpty {
-                        emptyState
-                    } else {
-                        orderList
-                    }
+                if viewModel.filteredOrders.isEmpty {
+                    emptyState
+                } else {
+                    orderList
                 }
             }
-            .navigationTitle("Commandes")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .searchable(text: $viewModel.searchText,
-                        prompt: "Rechercher une commande…")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    sortMenu
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    regenerateButton
-                }
+        }
+        .navigationTitle("Commandes")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .searchable(text: $viewModel.searchText,
+                    placement: .navigationBarDrawer(displayMode: .always),
+                    prompt: "Rechercher une commande…")
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                sortMenu
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                regenerateButton
             }
         }
     }
@@ -107,7 +106,7 @@ struct OrderListView: View {
             animationTrigger.toggle()
         }
         .refreshable {
-            viewModel.generateOrders()
+            await viewModel.generateOrders()
         }
     }
 
@@ -131,7 +130,7 @@ struct OrderListView: View {
 
     private var regenerateButton: some View {
         Button {
-            viewModel.generateOrders()
+            Task { await viewModel.generateOrders() }
         } label: {
             HStack(spacing: DS.Spacing.xs) {
                 if viewModel.isRegenerating {
@@ -158,7 +157,7 @@ struct OrderListView: View {
             Picker("Trier par", selection: $viewModel.sortOption) {
                 ForEach(OrderListViewModel.SortOption.allCases, id: \.self) { option in
                     Label(option.rawValue, systemImage: option.icon)
-                        .tag(option)
+                        .tag(option as OrderListViewModel.SortOption)
                 }
             }
         } label: {
@@ -190,3 +189,4 @@ struct OrderListView: View {
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isActive)
     }
 }
+

@@ -14,9 +14,9 @@ final class OrderListViewModel {
 
     private let generatorService: OrderGeneratorService
 
-    init(generatorService: OrderGeneratorService = OrderGeneratorService()) {
-        self.generatorService = generatorService
-        generateOrders()
+    init(generatorService: OrderGeneratorService? = nil) {
+        self.generatorService = generatorService ?? OrderGeneratorService()
+        Task { await generateOrders() }
     }
 
     var filteredOrders: [Order] {
@@ -45,18 +45,12 @@ final class OrderListViewModel {
         return result
     }
 
-    func generateOrders(count: Int? = nil) {
+    func generateOrders(count: Int? = nil) async {
         let n = count ?? orderCount
-        withAnimation(.easeOut(duration: 0.2)) {
-            isRegenerating = true
-        }
-        Task {
-            try? await Task.sleep(nanoseconds: 150_000_000)
-            orders = generatorService.generateOrders(count: n)
-            withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                isRegenerating = false
-            }
-        }
+        isRegenerating = true
+        try? await Task.sleep(nanoseconds: 150_000_000)
+        orders = generatorService.generateOrders(count: n)
+        isRegenerating = false
     }
 
     func deleteOrder(at offsets: IndexSet) {

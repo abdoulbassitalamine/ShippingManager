@@ -11,10 +11,12 @@ struct ShippingManagerApp: App {
         WindowGroup {
             TabView {
                 Tab("Commandes", systemImage: "shippingbox") {
-                    OrderListView(
-                        viewModel: orderListViewModel,
-                        containerConfig: containerConfigViewModel.config
-                    )
+                    NavigationStack {
+                        OrderListView(
+                            viewModel: orderListViewModel,
+                            containerConfig: containerConfigViewModel.config
+                        )
+                    }
                 }
 
                 Tab("Conteneurs", systemImage: "slider.horizontal.3") {

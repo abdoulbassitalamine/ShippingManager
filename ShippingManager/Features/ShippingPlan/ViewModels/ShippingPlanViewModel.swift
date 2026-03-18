@@ -11,8 +11,8 @@ final class ShippingPlanViewModel {
 
     private let planService: ShippingPlanService
 
-    init(planService: ShippingPlanService = ShippingPlanService()) {
-        self.planService = planService
+    init(planService: ShippingPlanService? = nil) {
+        self.planService = planService ?? ShippingPlanService()
     }
 
     func generatePlan(from orders: [Order],
@@ -28,7 +28,7 @@ final class ShippingPlanViewModel {
 
         Task {
             let plan = await Task.detached(priority: .userInitiated) {
-                self.planService.buildPlan(from: orders,
+                await self.planService.buildPlan(from: orders,
                                            config: config,
                                            algorithm: algorithm)
             }.value
@@ -38,8 +38,8 @@ final class ShippingPlanViewModel {
                 self.isLoading = false
             }
 
-            let generator = await UINotificationFeedbackGenerator()
-            await generator.notificationOccurred(.success)
+            let generator = UINotificationFeedbackGenerator()
+            generator.notificationOccurred(.success)
         }
     }
 
@@ -50,3 +50,4 @@ final class ShippingPlanViewModel {
         }
     }
 }
+
